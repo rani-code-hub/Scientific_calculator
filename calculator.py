@@ -1,15 +1,26 @@
 import math
 
-def calculate(expression):
+def calculate(expression, is_degree=False):
     try:
-        # Replace symbols for user-friendly input
         expression = expression.replace('^', '**')
 
-        # Allowed functions
+        # --- Custom trig functions ---
+        def sin(x):
+            return math.sin(math.radians(x)) if is_degree else math.sin(x)
+
+        def cos(x):
+            return math.cos(math.radians(x)) if is_degree else math.cos(x)
+
+        def tan(x):
+            # handle tan(90) type cases
+            if is_degree and (x % 180 == 90):
+                return "Undefined"
+            return math.tan(math.radians(x)) if is_degree else math.tan(x)
+
         allowed_names = {
-            "sin": math.sin,
-            "cos": math.cos,
-            "tan": math.tan,
+            "sin": sin,
+            "cos": cos,
+            "tan": tan,
             "log": math.log10,
             "sqrt": math.sqrt,
             "pi": math.pi,

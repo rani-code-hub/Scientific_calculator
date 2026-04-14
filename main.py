@@ -1,8 +1,7 @@
 import tkinter as tk
 from calculator import calculate
-import math
 
-# --- Global Modes ---
+# --- Modes ---
 is_degree = False
 is_dark = True
 
@@ -32,38 +31,24 @@ def toggle_theme():
         entry.config(bg="#2d2d2d", fg="white")
         history.config(bg="#121212", fg="white")
         theme_btn.config(text="🌙 Dark")
-
-        for btn in all_buttons:
-            btn.config(bg=btn.default_bg, fg="white")
-
+        for b in all_buttons:
+            b.config(bg=b.default_bg, fg="white")
     else:
         root.configure(bg="#f5f5f5")
         entry.config(bg="white", fg="black")
         history.config(bg="#e0e0e0", fg="black")
         theme_btn.config(text="☀ Light")
-
-        for btn in all_buttons:
-            btn.config(bg="white", fg="black")
+        for b in all_buttons:
+            b.config(bg="white", fg="black")
 
 def evaluate():
     expr = entry.get()
+    result = calculate(expr, is_degree)
 
-    try:
-        if is_degree:
-            expr = expr.replace("sin(", "math.sin(math.radians(")
-            expr = expr.replace("cos(", "math.cos(math.radians(")
-            expr = expr.replace("tan(", "math.tan(math.radians(")
+    history.insert(tk.END, f"{expr} = {result}\n")
 
-        result = calculate(expr)
-
-        history.insert(tk.END, f"{entry.get()} = {result}\n")
-
-        entry.delete(0, tk.END)
-        entry.insert(0, result)
-
-    except:
-        entry.delete(0, tk.END)
-        entry.insert(0, "Error")
+    entry.delete(0, tk.END)
+    entry.insert(0, result)
 
 # --- Keyboard ---
 def key_event(event):
@@ -79,10 +64,7 @@ def on_enter(e):
     e.widget['bg'] = "#00adb5"
 
 def on_leave(e, color):
-    if is_dark:
-        e.widget['bg'] = color
-    else:
-        e.widget['bg'] = "white"
+    e.widget['bg'] = color if is_dark else "white"
 
 # --- Window ---
 root = tk.Tk()
@@ -99,7 +81,7 @@ entry = tk.Entry(root, font=("Arial", 20),
                  justify="right")
 entry.pack(fill="both", ipadx=8, ipady=20, padx=10, pady=10)
 
-# --- Top Buttons Frame ---
+# --- Top Buttons ---
 top_frame = tk.Frame(root, bg=root["bg"])
 top_frame.pack()
 
@@ -111,11 +93,10 @@ theme_btn = tk.Button(top_frame, text="🌙 Dark", command=toggle_theme,
                       bg="#607d8b", fg="white", bd=0)
 theme_btn.grid(row=0, column=1, padx=10)
 
-# --- Main Frame ---
+# --- Buttons ---
 main_frame = tk.Frame(root, bg=root["bg"])
 main_frame.pack()
 
-# --- Buttons ---
 buttons = [
     ['7','8','9','/','sqrt'],
     ['4','5','6','*','log'],
@@ -160,8 +141,7 @@ for r, row in enumerate(buttons):
         b.bind("<Leave>", lambda e, col=color: on_leave(e, col))
 
 # --- History ---
-history = tk.Text(root, height=8,
-                  bg="#121212", fg="white", bd=0)
+history = tk.Text(root, height=8, bg="#121212", fg="white", bd=0)
 history.pack(fill="both", padx=10, pady=10)
 
 # --- Run ---
